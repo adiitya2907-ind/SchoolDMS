@@ -1,0 +1,89 @@
+<div class="mb-6 flex justify-between items-center">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">My Visits</h1>
+    <p class="text-sm text-gray-500 mt-1">Manage and track your field visits.</p>
+  </div>
+  <a routerLink="/engineer/visits/new" class="btn btn-primary shadow-sm">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+    New Visit
+  </a>
+</div>
+
+<div class="card mb-6 p-4">
+  <div class="flex flex-col md:flex-row gap-4">
+    <div class="flex-grow">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="text" class="input pl-10" placeholder="Search by school name, UDISE or district..." (input)="onSearchChange($event)">
+      </div>
+    </div>
+    <div class="w-full md:w-64 border rounded-md">
+      <select class="w-full h-10 bg-transparent border-none focus:ring-0 text-sm text-gray-900 px-3" (change)="onStatusFilterChange($event)">
+        <option value="">All Statuses</option>
+        <option value="Draft">Draft</option>
+        <option value="Submitted">Submitted</option>
+        <option value="PendingApproval">Pending Approval</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="card overflow-hidden">
+  <div *ngIf="isLoading" class="p-8 flex justify-center">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  
+  <div *ngIf="!isLoading" class="overflow-x-auto">
+    <table class="w-full text-sm text-left text-gray-500">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th scope="col" class="px-6 py-3">School Name</th>
+          <th scope="col" class="px-6 py-3">District</th>
+          <th scope="col" class="px-6 py-3">Visit Type</th>
+          <th scope="col" class="px-6 py-3">Date</th>
+          <th scope="col" class="px-6 py-3">Status</th>
+          <th scope="col" class="px-6 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let visit of filteredVisits" class="bg-white border-b hover:bg-gray-50">
+          <td class="px-6 py-4 font-medium text-gray-900">
+            <div>{{ visit.schoolName }}</div>
+            <div class="text-xs text-gray-500 font-normal">UDISE: {{ visit.udiseCode }}</div>
+          </td>
+          <td class="px-6 py-4">{{ visit.district }}</td>
+          <td class="px-6 py-4">{{ visit.visitType }}</td>
+          <td class="px-6 py-4">{{ visit.visitDate | date:'mediumDate' }}</td>
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium border" [ngClass]="getStatusClass(visit.status)">
+              {{ visit.status }}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <a [routerLink]="['/engineer/visits', visit.id]" class="btn btn-outline btn-sm h-8 px-3 text-xs">View</a>
+            <a *ngIf="visit.status === 'Draft'" [routerLink]="['/engineer/visits/edit', visit.id]" class="ml-2 font-medium text-primary hover:underline text-xs">Edit</a>
+          </td>
+        </tr>
+        <tr *ngIf="filteredVisits.length === 0">
+          <td colspan="6" class="px-6 py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No visits found</h3>
+            <p class="mt-1 text-sm text-gray-500">Get started by creating a new field visit.</p>
+            <div class="mt-6">
+              <a routerLink="/engineer/visits/new" class="btn btn-primary inline-flex items-center">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                New Visit
+              </a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
